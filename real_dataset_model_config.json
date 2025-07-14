@@ -1,0 +1,28 @@
+{
+  "feature_names": [
+    "num_cores",
+    "processor_speed",
+    "battery_capacity",
+    "fast_charging_available",
+    "ram_capacity",
+    "internal_memory",
+    "screen_size",
+    "refresh_rate",
+    "os_encoded",
+    "resolution_height",
+    "resolution_width"
+  ],
+  "label_classes": [
+    "HIGH",
+    "LOW",
+    "MID"
+  ],
+  "os_classes": [
+    "android",
+    "ios",
+    "other"
+  ],
+  "model_version": "3.0",
+  "features_count": 11,
+  "trained_on": "2025-07-14T21:41:47.133706"
+}
