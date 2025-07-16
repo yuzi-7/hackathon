@@ -3,14 +3,9 @@
     "num_cores",
     "processor_speed",
     "battery_capacity",
-    "fast_charging_available",
     "ram_capacity",
     "internal_memory",
-    "screen_size",
-    "refresh_rate",
-    "os_encoded",
-    "resolution_height",
-    "resolution_width"
+    "os_encoded"
   ],
   "label_classes": [
     "HIGH",
@@ -22,7 +17,7 @@
     "ios",
     "other"
   ],
-  "model_version": "3.0",
-  "features_count": 11,
-  "trained_on": "2025-07-14T21:41:47.133706"
+  "model_version": "4.0",
+  "features_count": 6,
+  "trained_on": "2025-07-16T22:48:10.335090"
 }
