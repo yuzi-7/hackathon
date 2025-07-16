@@ -38,12 +38,15 @@ class AndroidDeviceDataCollector:
                     # Extract device information
                     device_links = soup.find_all('a', href=True)
                     
+                    from bs4.element import Tag
                     for link in device_links:
-                        if 'phone' in link.get('href', ''):
-                            device_url = f"https://www.gsmarena.com/{link['href']}"
-                            device_data = self.scrape_device_details(device_url)
-                            if device_data:
-                                devices.append(device_data)
+                        if isinstance(link, Tag):
+                            href = link.get('href')
+                            if href is not None and 'phone' in href:
+                                device_url = f"https://www.gsmarena.com/{href}"
+                                device_data = self.scrape_device_details(device_url)
+                                if device_data:
+                                    devices.append(device_data)
                 
                 # Rate limiting - be respectful
                 time.sleep(2)
@@ -61,8 +64,9 @@ class AndroidDeviceDataCollector:
             soup = BeautifulSoup(response.content, 'html.parser')
             
             # Extract specifications (adapt selectors based on actual HTML structure)
+            name_tag = soup.find('h1', class_='specs-phone-name-title')
             device_data = {
-                'name': soup.find('h1', class_='specs-phone-name-title').text.strip(),
+                'name': name_tag.text.strip() if name_tag else None,
                 'cpu_cores': self._extract_cpu_cores(soup),
                 'cpu_frequency_mhz': self._extract_cpu_frequency(soup),
                 'ram_gb': self._extract_ram(soup),
@@ -135,15 +139,23 @@ class AndroidDeviceDataCollector:
                     # Extract benchmark results
                     results = soup.find_all('div', class_='result-row')
                     
+                    from bs4.element import Tag
                     for result in results:
-                        device_data = {
-                            'device_name': result.find('span', class_='device-name').text.strip(),
-                            'single_core_score': result.find('span', class_='single-core').text.strip(),
-                            'multi_core_score': result.find('span', class_='multi-core').text.strip(),
-                            'cpu_frequency': result.find('span', class_='frequency').text.strip(),
-                            'cores': result.find('span', class_='cores').text.strip()
-                        }
-                        devices.append(device_data)
+                        if isinstance(result, Tag):
+                            device_name_tag = result.find('span', attrs={'class': 'device-name'})
+                            single_core_tag = result.find('span', attrs={'class': 'single-core'})
+                            multi_core_tag = result.find('span', attrs={'class': 'multi-core'})
+                            frequency_tag = result.find('span', attrs={'class': 'frequency'})
+                            cores_tag = result.find('span', attrs={'class': 'cores'})
+
+                            device_data = {
+                                'device_name': device_name_tag.text.strip() if device_name_tag and device_name_tag.text else None,
+                                'single_core_score': single_core_tag.text.strip() if single_core_tag and single_core_tag.text else None,
+                                'multi_core_score': multi_core_tag.text.strip() if multi_core_tag and multi_core_tag.text else None,
+                                'cpu_frequency': frequency_tag.text.strip() if frequency_tag and frequency_tag.text else None,
+                                'cores': cores_tag.text.strip() if cores_tag and cores_tag.text else None
+                            }
+                            devices.append(device_data)
                 
                 time.sleep(1)  # Rate limiting
                 
@@ -284,10 +296,10 @@ def main():
         print("Invalid choice!")
         return
     
-    if not df.empty:
-        print(f"\n✅ Collected {len(df)} devices")
-        print(f"📊 Dataset shape: {df.shape}")
-        print(f"📋 Columns: {list(df.columns)}")
+    if df is not None and not df.empty:
+        print(f"\n Collected {len(df)} devices")
+        print(f" Dataset shape: {df.shape}")
+        print(f" Columns: {list(df.columns)}")
         
         # Save data
         collector.save_to_database(df)
